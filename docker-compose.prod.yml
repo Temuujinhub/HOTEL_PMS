@@ -64,7 +64,10 @@ services:
     expose:
       - '4000'
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:4000/health/live']
+      # Use 127.0.0.1 (not "localhost") so the check forces IPv4 — the API binds
+      # 0.0.0.0:4000 (IPv4) and "localhost" can resolve to IPv6 ::1 in Alpine,
+      # which would make the healthcheck (and only the healthcheck) fail.
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4000/health/live']
       interval: 10s
       timeout: 5s
       retries: 5
