@@ -1,0 +1,80 @@
+name: Deploy
+
+# Deploys the full Cloud PMS stack to the DigitalOcean droplet.
+#   • Manually  : Actions tab → "Deploy" → "Run workflow"
+#   • Automatic : on every push to main (e.g. after a PR is merged)
+#
+# Required secret (Settings → Secrets and variables → Actions → Secrets):
+#   DEPLOY_SSH_KEY   private SSH key whose public key is in the droplet's
+#                    ~/.ssh/authorized_keys
+#                    (the name DEPLOY_SSH_KEY1 is also accepted as a fallback)
+#
+# Optional repository variables (… → Variables) — sensible defaults shown:
+#   DEPLOY_HOST      168.144.41.111
+#   DEPLOY_USER      root
+#   DEPLOY_SSH_PORT  22
+#
+# See docs/DEPLOY_DIGITALOCEAN.md for the full setup walkthrough.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST || '168.144.41.111' }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER || 'root' }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH key
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY || secrets.DEPLOY_SSH_KEY1 }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::error title=Missing SSH key secret::Add DEPLOY_SSH_KEY (or DEPLOY_SSH_KEY1) under Settings → Secrets and variables → Actions. See docs/DEPLOY_DIGITALOCEAN.md"
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Sync project to droplet
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT -o StrictHostKeyChecking=accept-new" \
+            --rsync-path="mkdir -p /opt/cloud-pms && rsync" \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='**/node_modules/' \
+            --exclude='**/.next/' \
+            --exclude='**/dist/' \
+            --exclude='.env' \
+            ./ "$DEPLOY_USER@$DEPLOY_HOST:/opt/cloud-pms/"
+
+      - name: Build & start the stack on the droplet
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "PUBLIC_URL='http://$DEPLOY_HOST' bash /opt/cloud-pms/deploy/remote-deploy.sh"
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          {
+            echo "### Cloud PMS deployment"
+            echo ""
+            echo "- Target: \`$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PORT\`"
+            echo "- App: http://$DEPLOY_HOST"
+            echo "- API docs: http://$DEPLOY_HOST/api/docs"
+          } >> "$GITHUB_STEP_SUMMARY"

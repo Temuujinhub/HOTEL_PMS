@@ -1,5 +1,10 @@
 # Deployment
 
+> **Deploying to the DigitalOcean droplet?** Use the automated GitHub Actions
+> pipeline — see **[DEPLOY_DIGITALOCEAN.md](./DEPLOY_DIGITALOCEAN.md)**. It builds
+> on the server and serves the app on port 80 behind a Caddy reverse proxy. The
+> options below are the underlying/manual approaches.
+
 ## Option A — Docker Compose (simplest)
 
 Suitable for a single VM (e.g. a 2 vCPU / 4 GB cloud instance).
