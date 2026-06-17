@@ -1,0 +1,578 @@
+// =============================================================================
+// Cloud PMS — Prisma schema
+// Multi-tenant hotel & property management system.
+//
+// Tenancy model:
+//   Tenant (the business/SaaS customer)
+//     └── Property (a physical hotel / building)            [1..n]
+//           └── Rooms, Reservations, Guests, Folios, ...
+//   Every domain row carries `tenantId` for isolation (enforced at the
+//   application layer via a Prisma client extension + optional Postgres RLS).
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Enums
+// ----------------------------------------------------------------------------
+
+enum PlanTier {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  OWNER
+  GM
+  FRONT_DESK_MANAGER
+  FRONT_DESK
+  HOUSEKEEPING_SUPERVISOR
+  HOUSEKEEPING
+  FINANCE_MANAGER
+  REVENUE_MANAGER
+}
+
+enum VipLevel {
+  NONE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  DIRTY
+  CLEAN
+  INSPECTED
+  OUT_OF_ORDER
+  DND // do not disturb
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+}
+
+enum ReservationChannel {
+  DIRECT
+  WALK_IN
+  BOOKING_COM
+  AIRBNB
+  EXPEDIA
+  AGODA
+  TRIP_COM
+  VRBO
+  GOOGLE
+  OTHER
+}
+
+enum FolioStatus {
+  OPEN
+  CLOSED
+  SETTLED
+  VOID
+}
+
+enum FolioItemType {
+  ROOM
+  POS
+  EXTRA
+  DAMAGE
+  DEPOSIT
+  TAX
+  DISCOUNT
+  ADJUSTMENT
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  BANK_TRANSFER
+  QPAY
+  WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  VOIDED
+}
+
+enum PaymentDirection {
+  CHARGE
+  REFUND
+}
+
+enum HousekeepingType {
+  CHECKOUT_CLEAN
+  STAYOVER_CLEAN
+  TURNDOWN
+  INSPECTION
+  MAINTENANCE
+}
+
+enum HousekeepingPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum HousekeepingStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  INSPECTED
+  REJECTED
+}
+
+enum LockProvider {
+  NONE
+  SALTO
+  VINGCARD
+  DORMAKABA
+  NUKI
+  IGLOOHOME
+  KISI
+}
+
+// ----------------------------------------------------------------------------
+// Tenancy & identity
+// ----------------------------------------------------------------------------
+
+model Tenant {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String   @unique
+  legalName    String?
+  contactEmail String
+  contactPhone String?
+  country      String   @default("US") @db.Char(2)
+  currency     String   @default("USD") @db.Char(3)
+  timezone     String   @default("UTC")
+  logoUrl      String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscription      Subscription?
+  users             User[]
+  properties        Property[]
+  guests            Guest[]
+  roomTypes         RoomType[]
+  rooms             Room[]
+  ratePlans         RatePlan[]
+  reservations      Reservation[]
+  folios            Folio[]
+  housekeepingTasks HousekeepingTask[]
+
+  @@map("tenants")
+}
+
+model Subscription {
+  id              String             @id @default(uuid()) @db.Uuid
+  tenantId        String             @unique @db.Uuid
+  tier            PlanTier           @default(STARTER)
+  status          SubscriptionStatus @default(TRIALING)
+  roomLimit       Int                @default(30)
+  trialEndsAt     DateTime?
+  currentPeriodEnd DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  tenantId     String    @db.Uuid
+  propertyId   String?   @db.Uuid
+  email        String
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         UserRole  @default(FRONT_DESK)
+  phone        String?
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property    Property?          @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  hkAssigned  HousekeepingTask[] @relation("HkAssignee")
+  hkInspected HousekeepingTask[] @relation("HkInspector")
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+// ----------------------------------------------------------------------------
+// Property & inventory
+// ----------------------------------------------------------------------------
+
+model Property {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  name         String
+  code         String?
+  addressLine  String?
+  city         String?
+  country      String   @default("US") @db.Char(2)
+  timezone     String   @default("UTC")
+  currency     String   @default("USD") @db.Char(3)
+  taxRate      Decimal  @default(0.10) @db.Decimal(5, 4)
+  checkInTime  String   @default("14:00")
+  checkOutTime String   @default("12:00")
+  phone        String?
+  email        String?
+  totalFloors  Int?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users             User[]
+  roomTypes         RoomType[]
+  rooms             Room[]
+  ratePlans         RatePlan[]
+  guests            Guest[]
+  reservations      Reservation[]
+  folios            Folio[]
+  housekeepingTasks HousekeepingTask[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@map("properties")
+}
+
+model RoomType {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  propertyId   String   @db.Uuid
+  name         String
+  code         String
+  description  String?
+  baseRate     Decimal  @db.Decimal(10, 2)
+  maxOccupancy Int      @default(2)
+  maxAdults    Int      @default(2)
+  maxChildren  Int      @default(0)
+  bedType      String?
+  sizeSqm      Int?
+  amenities    Json?
+  photos       Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property     Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  rooms        Room[]
+  ratePlans    RatePlan[]
+  reservations Reservation[]
+
+  @@unique([propertyId, code])
+  @@index([tenantId])
+  @@index([propertyId])
+  @@map("room_types")
+}
+
+model Room {
+  id           String       @id @default(uuid()) @db.Uuid
+  tenantId     String       @db.Uuid
+  propertyId   String       @db.Uuid
+  roomTypeId   String       @db.Uuid
+  roomNumber   String
+  floor        Int?
+  status       RoomStatus   @default(AVAILABLE)
+  lockDeviceId String?
+  lockProvider LockProvider @default(NONE)
+  features     Json?
+  isSmoking    Boolean      @default(false)
+  maxOccupancy Int?
+  baseRate     Decimal?     @db.Decimal(10, 2)
+  notes        String?
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  roomType          RoomType           @relation(fields: [roomTypeId], references: [id], onDelete: Restrict)
+  reservations      Reservation[]
+  housekeepingTasks HousekeepingTask[]
+
+  @@unique([propertyId, roomNumber])
+  @@index([tenantId])
+  @@index([propertyId, status])
+  @@map("rooms")
+}
+
+model RatePlan {
+  id                String   @id @default(uuid()) @db.Uuid
+  tenantId          String   @db.Uuid
+  propertyId        String   @db.Uuid
+  roomTypeId        String?  @db.Uuid
+  name              String
+  code              String
+  description       String?
+  baseRate          Decimal  @db.Decimal(10, 2)
+  currency          String   @default("USD") @db.Char(3)
+  includesBreakfast Boolean  @default(false)
+  cancellationPolicy String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property     Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  roomType     RoomType?     @relation(fields: [roomTypeId], references: [id], onDelete: SetNull)
+  reservations Reservation[]
+
+  @@unique([propertyId, code])
+  @@index([tenantId])
+  @@map("rate_plans")
+}
+
+// ----------------------------------------------------------------------------
+// Guests (CRM)
+// ----------------------------------------------------------------------------
+
+model Guest {
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String   @db.Uuid
+  propertyId    String?  @db.Uuid
+  firstName     String
+  lastName      String
+  email         String?
+  phone         String?
+  passportNo    String? // application-level encrypted at rest
+  nationality   String?  @db.Char(2)
+  dateOfBirth   DateTime? @db.Date
+  address       String?
+  vipLevel      VipLevel @default(NONE)
+  loyaltyPoints Int      @default(0)
+  preferences   Json?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property     Property?     @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  reservations Reservation[]
+  folios       Folio[]
+
+  @@index([tenantId])
+  @@index([tenantId, email])
+  @@index([tenantId, lastName])
+  @@map("guests")
+}
+
+// ----------------------------------------------------------------------------
+// Reservations
+// ----------------------------------------------------------------------------
+
+model Reservation {
+  id              String             @id @default(uuid()) @db.Uuid
+  tenantId        String             @db.Uuid
+  propertyId      String             @db.Uuid
+  guestId         String             @db.Uuid
+  roomId          String?            @db.Uuid
+  roomTypeId      String             @db.Uuid
+  ratePlanId      String?            @db.Uuid
+  confirmationNo  String
+  channel         ReservationChannel @default(DIRECT)
+  status          ReservationStatus  @default(PENDING)
+  checkInDate     DateTime           @db.Date
+  checkOutDate    DateTime           @db.Date
+  nights          Int
+  adults          Int                @default(1)
+  children        Int                @default(0)
+  currency        String             @default("USD") @db.Char(3)
+  totalAmount     Decimal            @db.Decimal(12, 2)
+  paidAmount      Decimal            @default(0) @db.Decimal(12, 2)
+  depositAmount   Decimal            @default(0) @db.Decimal(12, 2)
+  specialRequests String?
+  notes           String?
+  sourceId        String? // external OTA reservation id
+  checkinAt       DateTime?
+  checkoutAt      DateTime?
+  cancelledAt     DateTime?
+  cancelReason    String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  guest    Guest     @relation(fields: [guestId], references: [id], onDelete: Restrict)
+  room     Room?     @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  roomType RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Restrict)
+  ratePlan RatePlan? @relation(fields: [ratePlanId], references: [id], onDelete: SetNull)
+  folio    Folio?
+
+  @@unique([tenantId, confirmationNo])
+  @@index([tenantId])
+  @@index([propertyId, status])
+  @@index([propertyId, checkInDate])
+  @@index([propertyId, checkOutDate])
+  @@map("reservations")
+}
+
+// ----------------------------------------------------------------------------
+// Finance: Folio / FolioItem / Payment
+// ----------------------------------------------------------------------------
+
+model Folio {
+  id            String      @id @default(uuid()) @db.Uuid
+  tenantId      String      @db.Uuid
+  propertyId    String      @db.Uuid
+  reservationId String      @unique @db.Uuid
+  guestId       String      @db.Uuid
+  number        String
+  status        FolioStatus @default(OPEN)
+  currency      String      @default("USD") @db.Char(3)
+  totalCharges  Decimal     @default(0) @db.Decimal(12, 2)
+  totalPayments Decimal     @default(0) @db.Decimal(12, 2)
+  balance       Decimal     @default(0) @db.Decimal(12, 2)
+  closedAt      DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property    Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  guest       Guest       @relation(fields: [guestId], references: [id], onDelete: Restrict)
+  items       FolioItem[]
+  payments    Payment[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId])
+  @@index([propertyId, status])
+  @@map("folios")
+}
+
+model FolioItem {
+  id          String        @id @default(uuid()) @db.Uuid
+  tenantId    String        @db.Uuid
+  folioId     String        @db.Uuid
+  type        FolioItemType @default(EXTRA)
+  description String
+  quantity    Int           @default(1)
+  unitAmount  Decimal       @db.Decimal(12, 2)
+  amount      Decimal       @db.Decimal(12, 2)
+  taxAmount   Decimal       @default(0) @db.Decimal(12, 2)
+  currency    String        @default("USD") @db.Char(3)
+  reference   String?
+  postedById  String?       @db.Uuid
+  createdAt   DateTime      @default(now())
+
+  folio Folio @relation(fields: [folioId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([folioId])
+  @@map("folio_items")
+}
+
+model Payment {
+  id            String           @id @default(uuid()) @db.Uuid
+  tenantId      String           @db.Uuid
+  folioId       String           @db.Uuid
+  direction     PaymentDirection @default(CHARGE)
+  method        PaymentMethod
+  status        PaymentStatus    @default(PENDING)
+  amount        Decimal          @db.Decimal(12, 2)
+  currency      String           @default("USD") @db.Char(3)
+  gateway       String? // stripe | adyen | qpay | manual
+  gatewayRef    String?
+  last4         String?
+  failureReason String?
+  processedById String?          @db.Uuid
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  folio Folio @relation(fields: [folioId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([folioId])
+  @@map("payments")
+}
+
+// ----------------------------------------------------------------------------
+// Housekeeping
+// ----------------------------------------------------------------------------
+
+model HousekeepingTask {
+  id            String               @id @default(uuid()) @db.Uuid
+  tenantId      String               @db.Uuid
+  propertyId    String               @db.Uuid
+  roomId        String               @db.Uuid
+  assignedToId  String?              @db.Uuid
+  inspectedById String?              @db.Uuid
+  reservationId String?              @db.Uuid
+  type          HousekeepingType     @default(CHECKOUT_CLEAN)
+  priority      HousekeepingPriority @default(NORMAL)
+  status        HousekeepingStatus   @default(PENDING)
+  notes         String?
+  photos        Json?
+  assignedAt    DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  inspectedAt   DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  assignedTo  User?    @relation("HkAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  inspectedBy User?    @relation("HkInspector", fields: [inspectedById], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([propertyId, status])
+  @@index([assignedToId])
+  @@map("housekeeping_tasks")
+}
+
+// ----------------------------------------------------------------------------
+// Audit log
+// ----------------------------------------------------------------------------
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String?  @db.Uuid
+  userId    String?  @db.Uuid
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+  @@map("audit_logs")
+}
