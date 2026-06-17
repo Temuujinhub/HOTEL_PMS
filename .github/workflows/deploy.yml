@@ -7,6 +7,7 @@ name: Deploy
 # Required secret (Settings → Secrets and variables → Actions → Secrets):
 #   DEPLOY_SSH_KEY   private SSH key whose public key is in the droplet's
 #                    ~/.ssh/authorized_keys
+#                    (the name DEPLOY_SSH_KEY1 is also accepted as a fallback)
 #
 # Optional repository variables (… → Variables) — sensible defaults shown:
 #   DEPLOY_HOST      168.144.41.111
@@ -37,10 +38,10 @@ jobs:
 
       - name: Configure SSH key
         env:
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY || secrets.DEPLOY_SSH_KEY1 }}
         run: |
           if [ -z "$DEPLOY_SSH_KEY" ]; then
-            echo "::error title=Missing secret DEPLOY_SSH_KEY::Add it under Settings → Secrets and variables → Actions. See docs/DEPLOY_DIGITALOCEAN.md"
+            echo "::error title=Missing SSH key secret::Add DEPLOY_SSH_KEY (or DEPLOY_SSH_KEY1) under Settings → Secrets and variables → Actions. See docs/DEPLOY_DIGITALOCEAN.md"
             exit 1
           fi
           mkdir -p ~/.ssh
