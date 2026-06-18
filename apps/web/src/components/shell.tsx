@@ -74,10 +74,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen bg-slate-50">
         {/* Sidebar */}
         <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
-          <div className="flex h-16 items-center gap-2 border-b border-slate-100 px-5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700 font-extrabold text-white">C</div>
+          <div className="flex h-16 items-center gap-2.5 border-b border-slate-100 px-5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 via-violet-500 to-fuchsia-500 font-bold text-white shadow-[0_6px_16px_-4px_rgba(124,58,237,0.6)]">
+              C
+            </div>
             <div>
-              <p className="text-sm font-bold text-brand-700">Cloud PMS</p>
+              <p className="font-display text-sm font-bold text-slate-900">Cloud PMS</p>
               <p className="text-[11px] text-muted">{user.tenant?.name}</p>
             </div>
           </div>
@@ -88,11 +90,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    active ? 'bg-brand-50 text-brand-700' : 'text-muted hover:bg-slate-100 hover:text-ink'
+                  className={`group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                    active
+                      ? 'bg-gradient-to-r from-brand-50 to-violet-50 text-brand-700 shadow-sm'
+                      : 'text-muted hover:bg-slate-100 hover:text-ink'
                   }`}
                 >
-                  <Icon path={item.icon} />
+                  <span className={active ? 'text-brand-600' : 'text-slate-400 group-hover:text-ink'}>
+                    <Icon path={item.icon} />
+                  </span>
                   {item.label}
                 </Link>
               );
@@ -106,7 +112,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <p className="truncate text-xs text-muted">{user.role.replace(/_/g, ' ')}</p>
               </div>
             </div>
-            <button onClick={logout} className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-muted hover:bg-slate-100">
+            <button onClick={logout} className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-muted transition hover:bg-slate-100">
               Sign out
             </button>
           </div>
@@ -114,17 +120,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
         {/* Main */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 sm:px-6">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-white/40 bg-white/70 px-4 backdrop-blur-xl sm:px-6">
             <div className="flex items-center gap-2 text-sm text-muted">
-              <span className="font-semibold text-ink md:hidden">Cloud PMS</span>
+              <span className="font-display font-semibold text-slate-900 md:hidden">Cloud PMS</span>
             </div>
             <div className="flex items-center gap-3">
               {properties.length > 0 && (
-                <Select
-                  value={propertyId}
-                  onChange={(e) => setPropertyId(e.target.value)}
-                  className="w-48"
-                >
+                <Select value={propertyId} onChange={(e) => setPropertyId(e.target.value)} className="w-48">
                   {properties.map((p) => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
@@ -132,9 +134,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               )}
             </div>
           </header>
-          <main className="flex-1 p-4 sm:p-6">
-            {ready ? children : <LoadingState />}
-          </main>
+          <main className="flex-1 p-4 sm:p-6">{ready ? children : <LoadingState />}</main>
         </div>
       </div>
     </PropertyContext.Provider>

@@ -23,7 +23,7 @@ export default function SectionHeading({
         {label}
       </p>
       <h2
-        className={`mt-3 text-3xl font-bold leading-[1.15] tracking-tight sm:text-[2.5rem] ${
+        className={`font-display mt-3 text-3xl font-bold leading-[1.12] tracking-tight sm:text-[2.5rem] ${
           light ? 'text-white' : 'text-slate-900'
         }`}
       >

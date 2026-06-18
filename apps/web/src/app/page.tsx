@@ -1,5 +1,6 @@
 import Nav from '@/components/landing/Nav';
 import Hero from '@/components/landing/Hero';
+import Transformation from '@/components/landing/Transformation';
 import Features from '@/components/landing/Features';
 import Solutions from '@/components/landing/Solutions';
 import Pricing from '@/components/landing/Pricing';
@@ -14,6 +15,7 @@ export default function LandingPage() {
       <Nav />
       <main>
         <Hero />
+        <Transformation />
         <Features />
         <Solutions />
         <Pricing />
