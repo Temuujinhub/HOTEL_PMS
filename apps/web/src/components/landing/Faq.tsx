@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import SectionHeading from './SectionHeading';
+import { Plus } from './icons';
 
 const FAQS = [
   {
@@ -34,32 +35,32 @@ export default function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="scroll-mt-20 bg-slate-100 px-5 py-20 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-7xl">
+    <section
+      id="faq"
+      className="scroll-mt-20 border-y border-slate-100 bg-slate-50 px-6 py-24 sm:py-28 lg:px-8"
+    >
+      <div className="mx-auto max-w-content">
         <SectionHeading center label="FAQ" title="Questions? We have answers" />
         <div className="mx-auto mt-12 max-w-3xl space-y-3">
           {FAQS.map((item, i) => {
             const isOpen = open === i;
             return (
-              <div key={item.q} className="overflow-hidden rounded-xl bg-white shadow-card">
+              <div key={item.q} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[15px] font-semibold text-ink"
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[15px] font-medium text-slate-900"
                 >
                   {item.q}
-                  <span
-                    className={`shrink-0 text-xl text-brand-700 transition-transform duration-200 ${
+                  <Plus
+                    className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${
                       isOpen ? 'rotate-45' : ''
                     }`}
-                    aria-hidden
-                  >
-                    +
-                  </span>
+                  />
                 </button>
                 {isOpen && (
-                  <p className="animate-fade-in px-6 pb-5 text-sm leading-relaxed text-muted">
+                  <p className="animate-fade-in px-6 pb-5 text-sm leading-relaxed text-slate-600">
                     {item.a}
                   </p>
                 )}

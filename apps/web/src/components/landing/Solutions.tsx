@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import SectionHeading from './SectionHeading';
+import { Check } from './icons';
 
 type Solution = {
   id: string;
@@ -96,25 +97,25 @@ export default function Solutions() {
   const current = SOLUTIONS.find((s) => s.id === active) ?? SOLUTIONS[0];
 
   return (
-    <section id="solutions" className="scroll-mt-20 bg-slate-100 px-5 py-20 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-7xl">
+    <section id="solutions" className="scroll-mt-20 border-y border-slate-100 bg-slate-50 px-6 py-24 sm:py-28 lg:px-8">
+      <div className="mx-auto max-w-content">
         <SectionHeading
           label="Use cases"
           title="A solution shaped to your property"
           subtitle="From boutique hotels to multi-unit rentals, Cloud PMS adapts to how you operate."
         />
 
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="mt-10 flex flex-wrap gap-2">
           {SOLUTIONS.map((s) => (
             <button
               key={s.id}
               type="button"
               onClick={() => setActive(s.id)}
               aria-pressed={active === s.id}
-              className={`rounded-lg border-2 px-5 py-2.5 text-sm font-semibold transition ${
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                 active === s.id
-                  ? 'border-brand-700 bg-brand-700 text-white'
-                  : 'border-slate-200 bg-white text-muted hover:border-brand-700 hover:text-brand-700'
+                  ? 'bg-brand-900 text-white shadow-sm'
+                  : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
               {s.tab}
@@ -122,26 +123,26 @@ export default function Solutions() {
           ))}
         </div>
 
-        <div key={current.id} className="animate-fade-in mt-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div key={current.id} className="animate-fade-in mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">
           <div>
-            <h3 className="text-xl font-bold text-ink">{current.heading}</h3>
+            <h3 className="text-xl font-semibold text-slate-900">{current.heading}</h3>
             <ul className="mt-5 space-y-3">
               {current.features.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-[15px] text-ink">
-                  <span className="mt-0.5 shrink-0 text-lg font-bold text-emerald-500" aria-hidden>
-                    ✓
+                <li key={f} className="flex items-start gap-3 text-[15px] text-slate-700">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.2} />
                   </span>
                   {f}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="rounded-xl bg-white p-7 shadow-card">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
             <div className="grid grid-cols-2 gap-3">
               {current.kpis.map((k) => (
-                <div key={k.lbl} className="rounded-xl bg-slate-100 p-4 text-center">
-                  <p className="text-2xl font-extrabold text-brand-700">{k.val}</p>
-                  <p className="mt-1 text-xs text-muted">{k.lbl}</p>
+                <div key={k.lbl} className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-center">
+                  <p className="tnum text-2xl font-bold tracking-tight text-slate-900">{k.val}</p>
+                  <p className="mt-1 text-xs text-slate-500">{k.lbl}</p>
                 </div>
               ))}
             </div>
