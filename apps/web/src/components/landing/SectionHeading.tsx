@@ -14,25 +14,25 @@ export default function SectionHeading({
   light?: boolean;
 }) {
   return (
-    <div className={center ? 'text-center' : ''}>
+    <div className={center ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'}>
       <p
-        className={`text-[13px] font-bold uppercase tracking-[0.15em] ${
-          light ? 'text-blue-400' : 'text-brand-700'
+        className={`text-xs font-semibold uppercase tracking-[0.18em] ${
+          light ? 'text-brand-200' : 'text-brand-600'
         }`}
       >
         {label}
       </p>
       <h2
-        className={`mt-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl ${
-          light ? 'text-white' : 'text-ink'
+        className={`mt-3 text-3xl font-bold leading-[1.15] tracking-tight sm:text-[2.5rem] ${
+          light ? 'text-white' : 'text-slate-900'
         }`}
       >
         {title}
       </h2>
       {subtitle && (
         <p
-          className={`mt-4 max-w-2xl text-lg leading-relaxed ${center ? 'mx-auto' : ''} ${
-            light ? 'text-slate-300' : 'text-muted'
+          className={`mt-4 text-lg leading-relaxed ${center ? 'mx-auto' : ''} ${
+            light ? 'text-slate-300' : 'text-slate-600'
           }`}
         >
           {subtitle}

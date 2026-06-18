@@ -1,4 +1,5 @@
 import SectionHeading from './SectionHeading';
+import { Star } from './icons';
 
 const TESTIMONIALS = [
   {
@@ -26,29 +27,30 @@ const TESTIMONIALS = [
 
 export default function Testimonials() {
   return (
-    <section className="bg-white px-5 py-20 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeading
-          center
-          label="Customer stories"
-          title="Real results from real properties"
-        />
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+    <section className="bg-white px-6 py-24 sm:py-28 lg:px-8">
+      <div className="mx-auto max-w-content">
+        <SectionHeading center label="Customer stories" title="Real results from real properties" />
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="rounded-xl bg-slate-100 p-7">
-              <div className="text-lg text-accent" aria-label="5 out of 5 stars">
-                ★★★★★
+            <figure
+              key={t.name}
+              className="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-card"
+            >
+              <div className="flex gap-0.5 text-accent" aria-label="5 out of 5 stars">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4" />
+                ))}
               </div>
-              <blockquote className="mt-3.5 text-[15px] italic leading-relaxed text-ink">
+              <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-slate-700">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-5 flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-700 text-base font-bold text-white">
+              <figcaption className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-900 text-sm font-semibold text-white">
                   {t.initial}
                 </span>
                 <span>
-                  <span className="block text-sm font-bold text-ink">{t.name}</span>
-                  <span className="block text-[13px] text-muted">{t.role}</span>
+                  <span className="block text-sm font-semibold text-slate-900">{t.name}</span>
+                  <span className="block text-[13px] text-slate-500">{t.role}</span>
                 </span>
               </figcaption>
             </figure>
