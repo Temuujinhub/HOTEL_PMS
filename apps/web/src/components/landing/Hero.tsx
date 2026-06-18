@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Star } from './icons';
+import { ArrowRight, Star, Bolt } from './icons';
 
 const STATS = [
   { num: '300+', label: 'OTA integrations' },
@@ -9,64 +9,71 @@ const STATS = [
 ];
 
 const ROOM_CELLS = [
-  'occ', 'occ', 'in', 'clean',
-  'occ', 'occ', 'free', 'occ',
-  'in', 'occ', 'occ', 'clean',
-  'occ', 'free', 'occ', 'occ',
+  'occ', 'occ', 'in', 'clean', 'occ', 'occ', 'free', 'occ',
+  'in', 'occ', 'occ', 'clean', 'occ', 'free', 'occ', 'occ',
 ];
 
 const ROOM_COLOR: Record<string, string> = {
-  occ: 'bg-emerald-100',
-  in: 'bg-brand-100',
-  clean: 'bg-accent-soft',
+  occ: 'bg-emerald-200',
+  in: 'bg-brand-200',
+  clean: 'bg-fuchsia-200',
   free: 'bg-slate-100',
 };
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-white px-6 pb-20 pt-28 sm:pt-32 lg:px-8 lg:pt-40">
-      {/* subtle backdrop */}
-      <div className="bg-dotgrid pointer-events-none absolute inset-x-0 top-0 h-[420px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(30,58,110,0.07),transparent)]" />
+    <section className="relative overflow-hidden bg-white px-6 pb-24 pt-28 sm:pt-32 lg:px-8 lg:pt-40">
+      {/* Animated aurora backdrop */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
+        <div className="absolute -left-24 -top-24 h-[28rem] w-[28rem] rounded-full bg-brand-400/40 blur-3xl animate-blob" />
+        <div
+          className="absolute -right-16 top-0 h-[26rem] w-[26rem] rounded-full bg-fuchsia-300/40 blur-3xl animate-blob"
+          style={{ animationDelay: '3s' }}
+        />
+        <div
+          className="absolute left-1/3 top-40 h-[24rem] w-[24rem] rounded-full bg-cyan-300/30 blur-3xl animate-blob"
+          style={{ animationDelay: '6s' }}
+        />
+      </div>
 
-      <div className="relative mx-auto grid max-w-content items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-        {/* Left column */}
+      <div className="relative mx-auto grid max-w-content items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+        {/* Left */}
         <div className="animate-fade-up">
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            New in 2026 — hospitality, reinvented
+          <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
+            <Bolt className="h-3.5 w-3.5 text-violet-600" />
+            The digital upgrade for modern hospitality
           </span>
 
-          <h1 className="mt-6 text-[2.5rem] font-bold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl">
-            Run your property,
-            <br className="hidden sm:block" /> <span className="text-brand-600">around the clock</span>
+          <h1 className="font-display mt-6 text-[2.75rem] font-bold leading-[1.02] tracking-tight text-slate-900 sm:text-6xl lg:text-[4.25rem]">
+            Run your property on{' '}
+            <span className="text-gradient">autopilot</span>, around the clock
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
             Self check-in, smart locks, a channel manager wired to 300+ OTAs, and a mobile
-            housekeeping app — unified in one real-time cloud platform that runs 24/7, with or
-            without a front desk.
+            housekeeping app — unified in one real-time platform that runs 24/7, with or without a
+            front desk.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/signup"
-              className="rounded-xl bg-brand-900 px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-violet-600 px-7 py-3.5 text-[15px] font-semibold text-white shadow-glow transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2"
             >
               Start free trial
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#contact"
-              className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-300 px-6 py-3.5 text-[15px] font-semibold text-slate-800 transition-colors hover:border-slate-900 hover:bg-slate-50"
+              className="glass inline-flex items-center gap-1.5 rounded-xl px-7 py-3.5 text-[15px] font-semibold text-slate-800 shadow-sm transition-all hover:-translate-y-0.5"
             >
               Book a demo
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </a>
           </div>
 
-          {/* Social proof */}
           <div className="mt-6 flex items-center gap-3">
-            <div className="flex text-accent" aria-hidden>
+            <div className="flex text-amber-400" aria-hidden>
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className="h-4 w-4" />
               ))}
@@ -76,38 +83,29 @@ export default function Hero() {
             </p>
           </div>
 
-          {/* Stats */}
-          <dl className="mt-10 grid max-w-lg grid-cols-2 gap-x-8 gap-y-6 border-t border-slate-100 pt-8 sm:grid-cols-4">
+          <dl className="mt-10 grid max-w-lg grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
             {STATS.map((s) => (
               <div key={s.label}>
                 <dt className="sr-only">{s.label}</dt>
                 <dd>
-                  <span className="tnum block text-2xl font-bold tracking-tight text-slate-900">
+                  <span className="font-display tnum block text-2xl font-bold tracking-tight text-slate-900">
                     {s.num}
                   </span>
-                  <span className="mt-1 block text-xs font-medium leading-tight text-slate-500">
-                    {s.label}
-                  </span>
+                  <span className="mt-1 block text-xs font-medium leading-tight text-slate-500">{s.label}</span>
                 </dd>
               </div>
             ))}
           </dl>
         </div>
 
-        {/* Right column — product mockup */}
-        <div className="animate-fade-up hidden md:block [animation-delay:120ms]">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lift">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
-                </span>
-                <span className="ml-1 text-xs font-medium text-slate-500">Cloud PMS · Reception</span>
-              </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+        {/* Right — floating glass product mockup */}
+        <div className="animate-fade-up relative hidden md:block" style={{ animationDelay: '140ms' }}>
+          <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-tr from-brand-400/30 via-violet-400/30 to-fuchsia-400/30 blur-2xl" aria-hidden />
+          <div className="animate-float relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 shadow-lift backdrop-blur-xl">
+            <div className="flex items-center justify-between bg-gradient-to-r from-brand-600 to-violet-600 px-5 py-3.5">
+              <span className="text-sm font-semibold text-white">Cloud PMS · Reception</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-medium text-white">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                 Live
               </span>
             </div>
@@ -127,11 +125,25 @@ export default function Hero() {
                 ))}
               </div>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
-                <Legend color="bg-emerald-100" label="Occupied" />
-                <Legend color="bg-brand-100" label="Check-in today" />
-                <Legend color="bg-accent-soft" label="Cleaning" />
+                <Legend color="bg-emerald-200" label="Occupied" />
+                <Legend color="bg-brand-200" label="Check-in today" />
+                <Legend color="bg-fuchsia-200" label="Cleaning" />
                 <Legend color="bg-slate-100" label="Available" />
               </div>
+            </div>
+          </div>
+
+          {/* floating accent badge */}
+          <div
+            className="animate-float absolute -bottom-5 -left-6 flex items-center gap-2 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-glow backdrop-blur-xl"
+            style={{ animationDelay: '1.2s' }}
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+              <Bolt className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="font-display text-sm font-bold leading-none text-slate-900">+18% RevPAR</p>
+              <p className="mt-1 text-[11px] text-slate-500">after 60 days</p>
             </div>
           </div>
         </div>
@@ -142,9 +154,9 @@ export default function Hero() {
 
 function MockCard({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+    <div className="rounded-xl border border-slate-200/80 bg-white/80 p-3.5">
       <p className="text-[11px] font-medium text-slate-500">{label}</p>
-      <p className="tnum mt-1 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
+      <p className="font-display tnum mt-1 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
       <p className="mt-1 text-[11px] font-medium text-emerald-600">{sub}</p>
     </div>
   );

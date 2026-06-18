@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import SectionHeading from './SectionHeading';
+import Reveal from './Reveal';
 import { Check, Minus, ShieldCheck } from './icons';
 
 type Plan = {
@@ -83,8 +84,7 @@ function withDiscount(price: string): string {
   if (!price.startsWith('$')) return price;
   const monthly = Number(price.replace(/[^0-9.]/g, ''));
   if (!monthly) return price;
-  const yearlyMonthly = Math.round(monthly * 0.8); // ~2 months free
-  return `$${yearlyMonthly}`;
+  return `$${Math.round(monthly * 0.8)}`;
 }
 
 export default function Pricing() {
@@ -93,17 +93,21 @@ export default function Pricing() {
   return (
     <section id="pricing" className="scroll-mt-20 bg-white px-6 py-24 sm:py-28 lg:px-8">
       <div className="mx-auto max-w-content">
-        <SectionHeading
-          center
-          label="Pricing"
-          title="Pricing that fits your property"
-          subtitle="No setup fee, no hidden costs, and you go live in days — not weeks."
-        />
+        <Reveal>
+          <SectionHeading
+            center
+            label="Pricing"
+            title={
+              <>
+                Pricing that fits <span className="text-gradient">your property</span>
+              </>
+            }
+            subtitle="No setup fee, no hidden costs, and you go live in days — not weeks."
+          />
+        </Reveal>
 
         <div className="mt-8 flex items-center justify-center gap-3">
-          <span className={`text-sm font-medium ${annual ? 'text-slate-500' : 'text-slate-900'}`}>
-            Monthly
-          </span>
+          <span className={`text-sm font-medium ${annual ? 'text-slate-500' : 'text-slate-900'}`}>Monthly</span>
           <button
             type="button"
             role="switch"
@@ -111,7 +115,7 @@ export default function Pricing() {
             aria-label="Toggle annual billing"
             onClick={() => setAnnual((v) => !v)}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              annual ? 'bg-brand-900' : 'bg-slate-300'
+              annual ? 'bg-gradient-to-r from-brand-600 to-violet-600' : 'bg-slate-300'
             }`}
           >
             <span
@@ -129,30 +133,24 @@ export default function Pricing() {
         </div>
 
         <div className="mt-14 grid items-start gap-6 lg:grid-cols-3">
-          {MONTHLY.map((plan) => {
-            const displayPrice =
-              annual && plan.price.startsWith('$') ? withDiscount(plan.price) : plan.price;
+          {MONTHLY.map((plan, i) => {
+            const displayPrice = annual && plan.price.startsWith('$') ? withDiscount(plan.price) : plan.price;
             const showPeriod = plan.period && plan.price.startsWith('$');
-            return (
+            const inner = (
               <div
-                key={plan.name}
-                className={`relative rounded-2xl bg-white p-8 ${
-                  plan.popular
-                    ? 'border-2 border-brand-900 shadow-lift lg:-mt-2 lg:mb-2'
-                    : 'border border-slate-200 shadow-card'
+                className={`relative flex h-full flex-col rounded-3xl bg-white p-8 ${
+                  plan.popular ? 'glass-card shadow-glow' : 'border border-slate-200 shadow-card'
                 }`}
               >
                 {plan.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand-900 px-3.5 py-1 text-xs font-semibold text-white">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-brand-600 to-violet-600 px-3.5 py-1 text-xs font-semibold text-white shadow-sm">
                     Most popular
                   </span>
                 )}
-                <p className="text-[13px] font-semibold uppercase tracking-wider text-slate-500">
-                  {plan.name}
-                </p>
+                <p className="text-[13px] font-semibold uppercase tracking-wider text-slate-500">{plan.name}</p>
                 <div className="mt-3 flex items-end gap-1">
                   <span
-                    className={`tnum font-bold tracking-tight text-slate-900 ${
+                    className={`font-display tnum font-bold tracking-tight ${plan.popular ? 'text-gradient' : 'text-slate-900'} ${
                       plan.price === 'Custom' ? 'text-3xl' : 'text-5xl'
                     }`}
                   >
@@ -163,18 +161,16 @@ export default function Pricing() {
                       {annual ? '/mo, billed yearly' : plan.period}
                     </span>
                   )}
-                  {plan.price === 'Custom' && (
-                    <span className="mb-1 text-base font-medium text-slate-500">pricing</span>
-                  )}
+                  {plan.price === 'Custom' && <span className="mb-1 text-base font-medium text-slate-500">pricing</span>}
                 </div>
                 <p className="mt-2 text-sm text-slate-500">{plan.rooms}</p>
 
                 <Link
                   href={plan.ctaHref}
-                  className={`mt-6 block w-full rounded-xl px-4 py-3 text-center text-[15px] font-semibold transition-colors ${
+                  className={`mt-6 block w-full rounded-xl px-4 py-3 text-center text-[15px] font-semibold transition-all ${
                     plan.popular
-                      ? 'bg-brand-900 text-white hover:bg-brand-800'
-                      : 'border border-slate-300 text-slate-900 hover:border-slate-900 hover:bg-slate-50'
+                      ? 'bg-gradient-to-r from-brand-600 to-violet-600 text-white shadow-glow hover:-translate-y-0.5'
+                      : 'border border-slate-300 text-slate-900 hover:border-brand-500 hover:text-brand-600'
                   }`}
                 >
                   {plan.cta}
@@ -184,32 +180,44 @@ export default function Pricing() {
                   {plan.features.map((f) => (
                     <li key={f.label} className="flex items-center gap-2.5 text-sm">
                       {f.included ? (
-                        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-brand-700">
-                          <Check className="h-4 w-4" strokeWidth={2.2} />
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                          <Check className="h-3.5 w-3.5" strokeWidth={2.4} />
                         </span>
                       ) : (
-                        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-slate-300">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center text-slate-300">
                           <Minus className="h-4 w-4" />
                         </span>
                       )}
-                      <span className={f.included ? 'text-slate-700' : 'text-slate-400'}>
-                        {f.label}
-                      </span>
+                      <span className={f.included ? 'text-slate-700' : 'text-slate-400'}>{f.label}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             );
+            return (
+              <Reveal key={plan.name} delay={i * 90} className="h-full">
+                {plan.popular ? (
+                  <div className="relative h-full rounded-3xl p-[1.5px] lg:-mt-2 lg:mb-2">
+                    <div className="gradient-ring absolute inset-0 rounded-3xl" aria-hidden />
+                    <div className="relative h-full">{inner}</div>
+                  </div>
+                ) : (
+                  inner
+                )}
+              </Reveal>
+            );
           })}
         </div>
 
-        <div className="mx-auto mt-8 flex max-w-3xl items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-6 py-4">
-          <ShieldCheck className="h-5 w-5 shrink-0 text-brand-700" />
-          <p className="text-center text-sm leading-relaxed text-slate-600">
-            <span className="font-semibold text-slate-900">Included in every plan:</span> No setup
-            fee · 14-day free trial · Cancel anytime · SSL secured · Scalable cloud infrastructure
-          </p>
-        </div>
+        <Reveal>
+          <div className="mx-auto mt-8 flex max-w-3xl items-center justify-center gap-2.5 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-4">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-brand-600" />
+            <p className="text-center text-sm leading-relaxed text-slate-600">
+              <span className="font-semibold text-slate-900">Included in every plan:</span> No setup fee · 14-day free
+              trial · Cancel anytime · SSL secured · Scalable cloud infrastructure
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

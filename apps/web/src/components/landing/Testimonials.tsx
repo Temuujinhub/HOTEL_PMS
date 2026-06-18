@@ -1,4 +1,5 @@
 import SectionHeading from './SectionHeading';
+import Reveal from './Reveal';
 import { Star } from './icons';
 
 const TESTIMONIALS = [
@@ -29,31 +30,40 @@ export default function Testimonials() {
   return (
     <section className="bg-white px-6 py-24 sm:py-28 lg:px-8">
       <div className="mx-auto max-w-content">
-        <SectionHeading center label="Customer stories" title="Real results from real properties" />
+        <Reveal>
+          <SectionHeading
+            center
+            label="Customer stories"
+            title={
+              <>
+                Real results from <span className="text-gradient">real properties</span>
+              </>
+            }
+          />
+        </Reveal>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <figure
-              key={t.name}
-              className="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-card"
-            >
-              <div className="flex gap-0.5 text-accent" aria-label="5 out of 5 stars">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4" />
-                ))}
-              </div>
-              <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-slate-700">
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-900 text-sm font-semibold text-white">
-                  {t.initial}
-                </span>
-                <span>
-                  <span className="block text-sm font-semibold text-slate-900">{t.name}</span>
-                  <span className="block text-[13px] text-slate-500">{t.role}</span>
-                </span>
-              </figcaption>
-            </figure>
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal key={t.name} delay={i * 90} className="h-full">
+              <figure className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-7 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-transparent hover:shadow-glow">
+                <div className="flex gap-0.5 text-amber-400" aria-label="5 out of 5 stars">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className="h-4 w-4" />
+                  ))}
+                </div>
+                <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-slate-700">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <figcaption className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-violet-500 text-sm font-semibold text-white">
+                    {t.initial}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-900">{t.name}</span>
+                    <span className="block text-[13px] text-slate-500">{t.role}</span>
+                  </span>
+                </figcaption>
+              </figure>
+            </Reveal>
           ))}
         </div>
       </div>

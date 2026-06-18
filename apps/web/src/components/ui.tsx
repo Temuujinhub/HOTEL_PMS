@@ -11,9 +11,10 @@ type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'danger' | 'accent';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 const BTN_VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-brand-700 text-white hover:bg-brand-600 disabled:opacity-50',
-  accent: 'bg-accent text-ink hover:bg-accent-dark disabled:opacity-50',
-  outline: 'border-2 border-brand-700 text-brand-700 hover:bg-brand-700 hover:text-white',
+  primary:
+    'bg-gradient-to-r from-brand-600 to-violet-600 text-white shadow-sm hover:-translate-y-0.5 hover:shadow-glow disabled:opacity-50 disabled:hover:translate-y-0',
+  accent: 'bg-accent text-white hover:bg-accent-dark disabled:opacity-50',
+  outline: 'border border-brand-300 text-brand-700 hover:bg-brand-50',
   ghost: 'text-muted hover:bg-slate-100',
   danger: 'bg-red-600 text-white hover:bg-red-700 disabled:opacity-50',
 };
@@ -38,7 +39,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed',
         BTN_VARIANTS[variant],
         BTN_SIZES[size],
         className,
@@ -55,7 +56,7 @@ export function Button({
 // ---- Card ------------------------------------------------------------------
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={cn('rounded-xl border border-slate-200 bg-white shadow-card', className)}>
+    <div className={cn('rounded-2xl border border-slate-200/80 bg-white shadow-card', className)}>
       {children}
     </div>
   );
@@ -67,7 +68,7 @@ export function CardHeader({ title, subtitle, action }: { title: string; subtitl
   return (
     <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
       <div>
-        <h3 className="font-semibold text-ink">{title}</h3>
+        <h3 className="font-display font-semibold text-ink">{title}</h3>
         {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
       </div>
       {action}
@@ -93,42 +94,23 @@ export function Label({ children, htmlFor }: { children: ReactNode; htmlFor?: st
   );
 }
 
+const FIELD =
+  'w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100';
+
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      className={cn(
-        'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100',
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <input className={cn(FIELD, className)} {...props} />;
 }
 
 export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select
-      className={cn(
-        'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100',
-        className,
-      )}
-      {...props}
-    >
+    <select className={cn(FIELD, 'bg-white', className)} {...props}>
       {children}
     </select>
   );
 }
 
 export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      className={cn(
-        'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100',
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <textarea className={cn(FIELD, className)} {...props} />;
 }
 
 // ---- Spinner ---------------------------------------------------------------
@@ -163,20 +145,18 @@ export function StatCard({
   accent?: string;
 }) {
   return (
-    <Card>
-      <CardBody>
-        <p className="text-sm font-medium text-muted">{label}</p>
-        <p className={cn('mt-1 text-3xl font-extrabold', accent ?? 'text-brand-700')}>{value}</p>
-        {sub && <p className="mt-1 text-xs text-muted">{sub}</p>}
-      </CardBody>
-    </Card>
+    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-glow">
+      <p className="text-sm font-medium text-muted">{label}</p>
+      <p className={cn('font-display tnum mt-1 text-3xl font-bold', accent ?? 'text-gradient')}>{value}</p>
+      {sub && <p className="mt-1 text-xs text-muted">{sub}</p>}
+    </div>
   );
 }
 
 // ---- Empty state -----------------------------------------------------------
 export function EmptyState({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center">
       <p className="text-base font-semibold text-ink">{title}</p>
       {description && <p className="mt-1 max-w-sm text-sm text-muted">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
@@ -189,7 +169,7 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-bold text-ink">{title}</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-ink">{title}</h1>
         {subtitle && <p className="mt-0.5 text-sm text-muted">{subtitle}</p>}
       </div>
       {action}
@@ -232,11 +212,11 @@ export function Modal({
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-8">
-      <div className={cn('animate-fade-in w-full rounded-xl bg-white shadow-lift', wide ? 'max-w-3xl' : 'max-w-lg')}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/50 p-4 backdrop-blur-sm sm:p-8">
+      <div className={cn('animate-fade-in w-full rounded-2xl bg-white shadow-lift', wide ? 'max-w-3xl' : 'max-w-lg')}>
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <h3 className="text-lg font-semibold text-ink">{title}</h3>
-          <button onClick={onClose} className="rounded p-1 text-2xl leading-none text-muted hover:bg-slate-100">
+          <h3 className="font-display text-lg font-semibold text-ink">{title}</h3>
+          <button onClick={onClose} className="rounded-lg p-1 text-2xl leading-none text-muted transition hover:bg-slate-100">
             ×
           </button>
         </div>
@@ -249,7 +229,12 @@ export function Modal({
 // ---- Avatar ----------------------------------------------------------------
 export function Avatar({ text, className }: { text: string; className?: string }) {
   return (
-    <div className={cn('flex h-9 w-9 items-center justify-center rounded-full bg-brand-700 text-sm font-bold text-white', className)}>
+    <div
+      className={cn(
+        'flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-violet-500 text-sm font-bold text-white',
+        className,
+      )}
+    >
       {text}
     </div>
   );
