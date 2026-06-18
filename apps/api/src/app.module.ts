@@ -28,6 +28,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { ChannelsModule } from './modules/channels/channels.module';
 import { LocksModule } from './modules/locks/locks.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PublicModule } from './modules/public/public.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ChannelsModule,
     LocksModule,
     NotificationsModule,
+    PublicModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

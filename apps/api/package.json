@@ -1,7 +1,7 @@
 {
   "name": "@cloud-pms/api",
   "version": "1.0.0",
-  "description": "Cloud PMS API — modular monolith (NestJS)",
+  "description": "Cloud MASTR PMS API — modular monolith (NestJS)",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

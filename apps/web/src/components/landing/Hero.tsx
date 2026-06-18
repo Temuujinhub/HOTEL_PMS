@@ -103,7 +103,7 @@ export default function Hero() {
           <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-tr from-brand-400/30 via-violet-400/30 to-fuchsia-400/30 blur-2xl" aria-hidden />
           <div className="animate-float relative overflow-hidden rounded-3xl border border-white/70 bg-white/80 shadow-lift backdrop-blur-xl">
             <div className="flex items-center justify-between bg-gradient-to-r from-brand-600 to-violet-600 px-5 py-3.5">
-              <span className="text-sm font-semibold text-white">Cloud PMS · Reception</span>
+              <span className="text-sm font-semibold text-white">Cloud MASTR PMS · Reception</span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-medium text-white">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                 Live

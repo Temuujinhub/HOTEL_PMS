@@ -109,7 +109,7 @@ export default function Solutions() {
                 A solution shaped to <span className="text-gradient">your property</span>
               </>
             }
-            subtitle="From boutique hotels to multi-unit rentals, Cloud PMS adapts to how you operate."
+            subtitle="From boutique hotels to multi-unit rentals, Cloud MASTR PMS adapts to how you operate."
           />
         </Reveal>
 

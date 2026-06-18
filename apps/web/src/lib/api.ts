@@ -1,5 +1,5 @@
 /**
- * Lightweight typed API client for the Cloud PMS backend.
+ * Lightweight typed API client for the Cloud MASTR PMS backend.
  * - Attaches the JWT access token from localStorage.
  * - Transparently refreshes the token once on a 401, then retries.
  * - Throws `ApiError` with a readable message on failure.

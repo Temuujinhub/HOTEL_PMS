@@ -253,6 +253,13 @@ model Property {
   phone        String?
   email        String?
   totalFloors  Int?
+  // Public booking site (per-property, served on a subdomain)
+  slug           String?  @unique
+  description    String?
+  logoUrl        String?
+  heroImageUrl   String?
+  images         Json?
+  bookingEnabled Boolean  @default(true)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -2,7 +2,7 @@
   "name": "cloud-pms",
   "version": "1.0.0",
   "private": true,
-  "description": "Cloud PMS — Multi-tenant hotel & property management SaaS",
+  "description": "Cloud MASTR PMS — Multi-tenant hotel & property management SaaS",
   "license": "UNLICENSED",
   "scripts": {
     "dev:api": "npm --prefix apps/api run start:dev",

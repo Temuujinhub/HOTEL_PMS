@@ -79,7 +79,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               C
             </div>
             <div>
-              <p className="font-display text-sm font-bold text-slate-900">Cloud PMS</p>
+              <p className="font-display text-sm font-bold text-slate-900">Cloud MASTR PMS</p>
               <p className="text-[11px] text-muted">{user.tenant?.name}</p>
             </div>
           </div>
@@ -122,7 +122,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-white/40 bg-white/70 px-4 backdrop-blur-xl sm:px-6">
             <div className="flex items-center gap-2 text-sm text-muted">
-              <span className="font-display font-semibold text-slate-900 md:hidden">Cloud PMS</span>
+              <span className="font-display font-semibold text-slate-900 md:hidden">Cloud MASTR PMS</span>
             </div>
             <div className="flex items-center gap-3">
               {properties.length > 0 && (

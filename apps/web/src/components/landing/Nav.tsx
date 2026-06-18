@@ -30,11 +30,11 @@ export default function Nav() {
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-content items-center justify-between px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="Cloud PMS home">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="Cloud MASTR PMS home">
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 via-violet-500 to-fuchsia-500 text-[15px] font-bold text-white shadow-[0_6px_16px_-4px_rgba(124,58,237,0.6)]">
             C
           </span>
-          <span className="font-display text-[17px] font-bold tracking-tight text-slate-900">Cloud PMS</span>
+          <span className="font-display text-[17px] font-bold tracking-tight text-slate-900">Cloud MASTR PMS</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

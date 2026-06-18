@@ -25,7 +25,7 @@ const FOOTER_COLUMNS: { title: string; links: { label: string; href: string }[] 
   {
     title: 'Company',
     links: [
-      { label: 'About Cloud PMS', href: '#' },
+      { label: 'About Cloud MASTR PMS', href: '#' },
       { label: 'Contact', href: '#contact' },
       { label: 'Careers', href: '#' },
       { label: 'Blog', href: '#' },
@@ -82,7 +82,7 @@ export default function CtaFooter() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 via-violet-500 to-fuchsia-500 text-[15px] font-bold text-white">
                   C
                 </span>
-                <span className="font-display text-[17px] font-bold tracking-tight text-slate-900">Cloud PMS</span>
+                <span className="font-display text-[17px] font-bold tracking-tight text-slate-900">Cloud MASTR PMS</span>
               </Link>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-600">
                 The unified property management system for hotels, apartments, and vacation rentals, built for
@@ -112,8 +112,8 @@ export default function CtaFooter() {
           </div>
 
           <div className="mt-12 flex flex-col gap-2 border-t border-slate-200 pt-6 text-[13px] text-slate-500 sm:flex-row sm:justify-between">
-            <span>© 2026 Cloud PMS. All rights reserved.</span>
-            <span>Cloud PMS v1.0</span>
+            <span>© 2026 Cloud MASTR PMS. All rights reserved.</span>
+            <span>Cloud MASTR PMS v1.0</span>
           </div>
         </div>
       </footer>
