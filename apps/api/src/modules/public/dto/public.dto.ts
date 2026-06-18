@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsDateString, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class PublicAvailabilityQueryDto {
   @ApiProperty({ example: '2026-07-01' })
@@ -89,4 +89,50 @@ export class LookupQueryDto {
   @IsString()
   @IsNotEmpty()
   lastName!: string;
+}
+
+/** Self-service kiosk: identify a booking by confirmation number + last name. */
+export class KioskLookupDto {
+  @ApiProperty({ example: 'CR-3F9K2A7Q' })
+  @IsString()
+  @IsNotEmpty()
+  confirmationNo!: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  lastName!: string;
+}
+
+/** Self-service kiosk: complete check-in and issue a room key. */
+export class KioskCheckInDto {
+  @ApiProperty({ example: 'CR-3F9K2A7Q' })
+  @IsString()
+  @IsNotEmpty()
+  confirmationNo!: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  lastName!: string;
+
+  @ApiPropertyOptional({ description: 'Chosen room; auto-assigned when omitted' })
+  @IsOptional()
+  @IsUUID()
+  roomId?: string;
+
+  @ApiPropertyOptional({ enum: ['rfid_card', 'pin_code'], default: 'rfid_card' })
+  @IsOptional()
+  @IsIn(['rfid_card', 'pin_code'])
+  credentialType?: 'rfid_card' | 'pin_code';
+
+  @ApiPropertyOptional({ description: 'Passport / ID number — stored encrypted for legal registration only' })
+  @IsOptional()
+  @IsString()
+  passportNo?: string;
+
+  @ApiPropertyOptional({ description: 'ISO 3166-1 alpha-2 nationality' })
+  @IsOptional()
+  @IsString()
+  nationality?: string;
 }

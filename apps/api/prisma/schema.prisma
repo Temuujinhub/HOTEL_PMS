@@ -159,6 +159,25 @@ enum LockProvider {
   KISI
 }
 
+enum LockCredentialKind {
+  RFID_CARD
+  PIN_CODE
+  DIGITAL_KEY
+}
+
+enum LockCredentialStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+// How a credential was issued — at the front desk by staff, or self-service
+// by the guest at a lobby kiosk.
+enum CredentialIssuedVia {
+  FRONT_DESK
+  KIOSK
+}
+
 // ----------------------------------------------------------------------------
 // Tenancy & identity
 // ----------------------------------------------------------------------------
@@ -188,6 +207,7 @@ model Tenant {
   reservations      Reservation[]
   folios            Folio[]
   housekeepingTasks HousekeepingTask[]
+  lockCredentials   LockCredential[]
 
   @@map("tenants")
 }
@@ -273,6 +293,7 @@ model Property {
   reservations      Reservation[]
   folios            Folio[]
   housekeepingTasks HousekeepingTask[]
+  lockCredentials   LockCredential[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -333,6 +354,7 @@ model Room {
   roomType          RoomType           @relation(fields: [roomTypeId], references: [id], onDelete: Restrict)
   reservations      Reservation[]
   housekeepingTasks HousekeepingTask[]
+  lockCredentials   LockCredential[]
 
   @@unique([propertyId, roomNumber])
   @@index([tenantId])
@@ -441,6 +463,7 @@ model Reservation {
   roomType RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Restrict)
   ratePlan RatePlan? @relation(fields: [ratePlanId], references: [id], onDelete: SetNull)
   folio    Folio?
+  lockCredentials LockCredential[]
 
   @@unique([tenantId, confirmationNo])
   @@index([tenantId])
@@ -563,6 +586,44 @@ model HousekeepingTask {
   @@index([propertyId, status])
   @@index([assignedToId])
   @@map("housekeeping_tasks")
+}
+
+// ----------------------------------------------------------------------------
+// Smart locks — issued guest access credentials
+// ----------------------------------------------------------------------------
+
+model LockCredential {
+  id              String               @id @default(uuid()) @db.Uuid
+  tenantId        String               @db.Uuid
+  propertyId      String               @db.Uuid
+  reservationId   String               @db.Uuid
+  roomId          String               @db.Uuid
+  provider        LockProvider         @default(NONE)
+  type            LockCredentialKind   @default(RFID_CARD)
+  status          LockCredentialStatus @default(ACTIVE)
+  issuedVia       CredentialIssuedVia  @default(FRONT_DESK)
+  // Provider-side identifier for the credential (used to revoke at the vendor).
+  credentialRef   String
+  // RFID/NFC card serial written at the encoder (not secret).
+  cardId          String?
+  // Secrets — stored AES-256-GCM encrypted at rest (see CryptoService).
+  pinCode         String?
+  digitalKeyToken String?
+  validFrom       DateTime
+  validUntil      DateTime
+  revokedAt       DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property    Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  room        Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([reservationId])
+  @@index([roomId, status])
+  @@map("lock_credentials")
 }
 
 // ----------------------------------------------------------------------------
