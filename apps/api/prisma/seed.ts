@@ -99,6 +99,14 @@ async function seedTenant(opts: {
       totalFloors: opts.floors,
       phone: '+1 555 0100',
       email: `front@${opts.emailDomain}`,
+      slug: opts.slug,
+      description: `Welcome to ${opts.propertyName} in ${opts.city}. Modern rooms, 24/7 self check-in, and instant booking — reserve your stay in seconds.`,
+      heroImageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80',
+      images: [
+        'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=1200&q=80',
+      ],
     },
   });
 
@@ -133,8 +141,15 @@ async function seedTenant(opts: {
   );
 
   // Room types
+  const ROOM_PHOTOS = [
+    'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80',
+  ];
   const roomTypes = await Promise.all(
-    opts.roomTypes.map((rt) =>
+    opts.roomTypes.map((rt, i) =>
       prisma.roomType.create({
         data: {
           tenantId: tenant.id,
@@ -147,6 +162,7 @@ async function seedTenant(opts: {
           bedType: rt.bedType,
           description: `${rt.name} — ${rt.bedType} bed, sleeps ${rt.maxOccupancy}`,
           amenities: ['WiFi', 'Air conditioning', 'Smart TV', 'Minibar'],
+          photos: [ROOM_PHOTOS[i % ROOM_PHOTOS.length], ROOM_PHOTOS[(i + 1) % ROOM_PHOTOS.length]],
         },
       }),
     ),

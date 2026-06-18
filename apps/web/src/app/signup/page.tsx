@@ -44,7 +44,7 @@ export default function SignupPage() {
       <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-card">
         <Link href="/" className="mb-6 flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700 font-extrabold text-white">C</div>
-          <span className="text-lg font-bold text-brand-700">Cloud PMS</span>
+          <span className="text-lg font-bold text-brand-700">Cloud MASTR PMS</span>
         </Link>
         <h2 className="text-2xl font-bold text-ink">Create your account</h2>
         <p className="mt-1 text-sm text-muted">14-day free trial. No credit card required.</p>

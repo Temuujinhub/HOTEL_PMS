@@ -41,7 +41,7 @@ export default function Transformation() {
           <Reveal>
             <div className="h-full rounded-3xl border border-slate-200 bg-white p-8 grayscale">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Before</p>
-              <h3 className="font-display mt-2 text-xl font-bold text-slate-500">Without Cloud PMS</h3>
+              <h3 className="font-display mt-2 text-xl font-bold text-slate-500">Without Cloud MASTR PMS</h3>
               <ul className="mt-6 space-y-3.5">
                 {BEFORE.map((b) => (
                   <li key={b} className="flex items-start gap-3 text-[15px] text-slate-500">
@@ -68,7 +68,7 @@ export default function Transformation() {
               <div className="gradient-ring absolute inset-0 rounded-3xl" aria-hidden />
               <div className="glass-card relative h-full rounded-3xl p-8">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">After</p>
-                <h3 className="font-display mt-2 text-xl font-bold text-slate-900">With Cloud PMS</h3>
+                <h3 className="font-display mt-2 text-xl font-bold text-slate-900">With Cloud MASTR PMS</h3>
                 <ul className="mt-6 space-y-3.5">
                   {AFTER.map((a) => (
                     <li key={a} className="flex items-start gap-3 text-[15px] font-medium text-slate-800">

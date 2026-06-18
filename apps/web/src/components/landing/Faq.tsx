@@ -7,7 +7,7 @@ import { Plus } from './icons';
 
 const FAQS = [
   {
-    q: 'How long does it take to implement Cloud PMS?',
+    q: 'How long does it take to implement Cloud MASTR PMS?',
     a: 'Implementation usually wraps up in 1–5 days, depending on the size of your property. Our specialists handle data migration, staff training, and the full configuration process for you.',
   },
   {

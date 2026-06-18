@@ -38,7 +38,7 @@ export default function LoginPage() {
       <div className="relative hidden w-1/2 flex-col justify-between bg-gradient-to-br from-brand-700 to-brand-900 p-12 text-white lg:flex">
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 font-extrabold">C</div>
-          <span className="text-xl font-bold">Cloud PMS</span>
+          <span className="text-xl font-bold">Cloud MASTR PMS</span>
         </Link>
         <div>
           <h1 className="text-4xl font-extrabold leading-tight">Run your property from anywhere.</h1>
@@ -47,7 +47,7 @@ export default function LoginPage() {
             cloud platform.
           </p>
         </div>
-        <p className="text-sm text-white/60">© {new Date().getFullYear()} Cloud PMS</p>
+        <p className="text-sm text-white/60">© {new Date().getFullYear()} Cloud MASTR PMS</p>
       </div>
 
       {/* Right form */}
@@ -55,7 +55,7 @@ export default function LoginPage() {
         <div className="mx-auto w-full max-w-sm">
           <Link href="/" className="mb-8 flex items-center gap-2 lg:hidden">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700 font-extrabold text-white">C</div>
-            <span className="text-lg font-bold text-brand-700">Cloud PMS</span>
+            <span className="text-lg font-bold text-brand-700">Cloud MASTR PMS</span>
           </Link>
           <h2 className="text-2xl font-bold text-ink">Welcome back</h2>
           <p className="mt-1 text-sm text-muted">Sign in to your dashboard</p>

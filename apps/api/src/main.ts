@@ -34,7 +34,7 @@ async function bootstrap() {
 
   // OpenAPI / Swagger
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Cloud PMS API')
+    .setTitle('Cloud MASTR PMS API')
     .setDescription('Multi-tenant hotel & property management system API')
     .setVersion('1.0')
     .addBearerAuth()
@@ -54,7 +54,7 @@ async function bootstrap() {
   const port = config.get<number>('port') as number;
   await app.listen(port, '0.0.0.0');
   // eslint-disable-next-line no-console
-  console.log(`🚀 Cloud PMS API listening on http://localhost:${port}  (docs: /api/docs)`);
+  console.log(`🚀 Cloud MASTR PMS API listening on http://localhost:${port}  (docs: /api/docs)`);
 }
 
 bootstrap();
