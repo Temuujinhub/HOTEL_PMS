@@ -22,6 +22,10 @@ export class MockLockAdapter implements LockAdapter {
   async createCredential(input: LockCredentialInput): Promise<LockCredential> {
     // Real adapter: POST to the provider, passing the lock device id + window.
     const credentialId = randomUUID();
+    const cardId =
+      input.credentialType === 'rfid_card'
+        ? randomUUID().replace(/-/g, '').slice(0, 14).toUpperCase()
+        : null;
     const pinCode =
       input.credentialType === 'pin_code'
         ? String(Math.floor(100000 + Math.random() * 900000))
@@ -39,6 +43,7 @@ export class MockLockAdapter implements LockAdapter {
       credentialId,
       provider: input.lockProvider,
       credentialType: input.credentialType,
+      cardId,
       pinCode,
       digitalKeyToken,
       validFrom: input.checkIn,

@@ -27,6 +27,8 @@ export interface LockCredential {
   credentialId: string;
   provider: LockProvider;
   credentialType: LockCredentialType;
+  /** Populated for `rfid_card` credentials — the encoded card serial. */
+  cardId?: string | null;
   /** Populated for `pin_code` credentials. */
   pinCode?: string | null;
   /** Populated for `digital_key` credentials. */

@@ -18,6 +18,7 @@ export const TENANT_SCOPED_MODELS = new Set<string>([
   'FolioItem',
   'Payment',
   'HousekeepingTask',
+  'LockCredential',
   'AuditLog',
 ]);
 

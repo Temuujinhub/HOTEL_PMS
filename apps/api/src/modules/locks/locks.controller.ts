@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseUUIDPipe,
   Post,
@@ -23,6 +24,13 @@ export class LocksController {
   @ApiOperation({ summary: 'Issue a smart-lock credential for a reservation' })
   createCredential(@Body() dto: CreateCredentialDto) {
     return this.locksService.createCredential(dto);
+  }
+
+  @Get('reservations/:reservationId/credentials')
+  @Roles(UserRole.FRONT_DESK_MANAGER, UserRole.FRONT_DESK, UserRole.GM)
+  @ApiOperation({ summary: 'List a reservation’s issued credentials (secrets masked)' })
+  listForReservation(@Param('reservationId', ParseUUIDPipe) reservationId: string) {
+    return this.locksService.listForReservation(reservationId);
   }
 
   @Delete('credentials/:id')

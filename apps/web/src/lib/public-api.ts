@@ -62,6 +62,38 @@ export type BookingResult = {
   checkOutTime?: string;
 };
 
+export type KioskRoom = { id: string; roomNumber: string; floor: number | null };
+
+export type KioskLookup = {
+  confirmationNo: string;
+  status: string;
+  guestName: string;
+  roomType: string | null;
+  checkInDate: string;
+  checkOutDate: string;
+  nights: number;
+  adults: number;
+  children: number;
+  currency: string;
+  totalAmount: number;
+  canCheckIn: boolean;
+  alreadyCheckedIn: boolean;
+  assignedRoom: KioskRoom | null;
+  availableRooms: KioskRoom[];
+  property: { name: string; checkInTime: string; checkOutTime: string };
+};
+
+export type KioskCheckInResult = {
+  confirmationNo: string;
+  guestName: string;
+  status: string;
+  room: { roomNumber: string; floor: number | null };
+  credential: { type: 'RFID_CARD' | 'PIN_CODE' | 'DIGITAL_KEY'; cardId: string | null; pinCode: string | null };
+  checkOutDate: string;
+  checkOutTime: string;
+  propertyName: string;
+};
+
 export const publicApi = {
   async property(slug: string): Promise<{ property: PublicProperty; roomTypes: PublicRoomType[] }> {
     return handle(await fetch(`${PUBLIC_API_BASE}/properties/${slug}`, { cache: 'no-store' }));
@@ -107,6 +139,34 @@ export const publicApi = {
     return handle(
       await fetch(`${PUBLIC_API_BASE}/properties/${slug}/reservations/${confirmationNo}?${params}`, {
         cache: 'no-store',
+      }),
+    );
+  },
+  async kioskLookup(slug: string, body: { confirmationNo: string; lastName: string }): Promise<KioskLookup> {
+    return handle(
+      await fetch(`${PUBLIC_API_BASE}/properties/${slug}/kiosk/lookup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+    );
+  },
+  async kioskCheckIn(
+    slug: string,
+    body: {
+      confirmationNo: string;
+      lastName: string;
+      roomId?: string;
+      credentialType?: 'rfid_card' | 'pin_code';
+      passportNo?: string;
+      nationality?: string;
+    },
+  ): Promise<KioskCheckInResult> {
+    return handle(
+      await fetch(`${PUBLIC_API_BASE}/properties/${slug}/kiosk/check-in`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       }),
     );
   },

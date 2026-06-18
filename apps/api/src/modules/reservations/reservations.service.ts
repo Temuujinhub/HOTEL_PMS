@@ -1,11 +1,21 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, ReservationStatus, RoomStatus } from '@prisma/client';
+import {
+  CredentialIssuedVia,
+  LockCredentialKind,
+  LockCredentialStatus,
+  LockProvider,
+  Prisma,
+  ReservationStatus,
+  RoomStatus,
+} from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { TenantContextService } from '../../common/tenancy/tenant-context.service';
+import { LocksService } from '../locks/locks.service';
 import { generateCode } from '../../common/utils/ids';
 import { paginate } from '../../common/dto/pagination.dto';
 import {
@@ -37,9 +47,12 @@ const DETAIL_INCLUDE = {
 
 @Injectable()
 export class ReservationsService {
+  private readonly logger = new Logger(ReservationsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly tenantContext: TenantContextService,
+    private readonly locks: LocksService,
   ) {}
 
   // --- Availability --------------------------------------------------------
@@ -322,7 +335,53 @@ export class ReservationsService {
       });
       await tx.room.update({ where: { id: roomId }, data: { status: RoomStatus.OCCUPIED } });
     });
+
+    // Auto-issue a smart-lock key when the room has a lock configured and no
+    // active credential exists yet (e.g. the kiosk already issued one).
+    await this.autoIssueLockCredential(
+      id,
+      roomId,
+      reservation.checkOutDate,
+    );
+
     return this.getOne(id);
+  }
+
+  /**
+   * Best-effort smart-lock key issuance on check-in. Never blocks check-in: a
+   * provider failure is logged and the front desk can re-issue manually.
+   */
+  private async autoIssueLockCredential(
+    reservationId: string,
+    roomId: string,
+    checkOutDate: Date,
+  ): Promise<void> {
+    try {
+      const room = await this.prisma.scoped.room.findFirst({ where: { id: roomId } });
+      if (!room || room.lockProvider === LockProvider.NONE) return;
+
+      const existing = await this.prisma.scoped.lockCredential.findFirst({
+        where: { reservationId, status: LockCredentialStatus.ACTIVE },
+      });
+      if (existing) return;
+
+      await this.locks.issue({
+        reservationId,
+        roomId,
+        provider: room.lockProvider,
+        type: LockCredentialKind.RFID_CARD,
+        validFrom: new Date(),
+        // Key valid through checkout-day noon (matches the default checkout time).
+        validUntil: new Date(checkOutDate.getTime() + 12 * 3_600_000),
+        issuedVia: CredentialIssuedVia.FRONT_DESK,
+      });
+    } catch (err) {
+      this.logger.warn(
+        `Auto-issue lock credential failed for reservation ${reservationId}: ${
+          err instanceof Error ? err.message : err
+        }`,
+      );
+    }
   }
 
   async checkOut(id: string) {
