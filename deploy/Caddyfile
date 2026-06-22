@@ -1,16 +1,23 @@
 # =============================================================================
 # Cloud PMS — reverse proxy (Caddy) for the production droplet.
 #
-# Plain HTTP on port 80 because we are serving on a bare IP (no domain yet).
-# When you point a domain at the server, replace ":80" with "your-domain.com"
-# and remove "auto_https off" — Caddy will then provision HTTPS automatically.
+# Caddy serves the public domain over HTTPS (automatic Let's Encrypt cert that
+# it provisions and renews on its own) and redirects HTTP→HTTPS. Plain HTTP on
+# the bare IP is kept as a fallback so http://<server-ip> still works.
+#
+# Requirements for the certificate to be issued:
+#   • DNS A record for the domain points at this server   (mastrsys.com ✓)
+#   • Ports 80 AND 443 are reachable from the public internet
+#     (publish 443 in docker-compose.prod.yml AND open it in the firewall)
+#
+# To use a different domain, change the host names in the "domain" site block.
 # =============================================================================
 {
 	admin off
-	auto_https off
 }
 
-:80 {
+# Shared routing for the whole stack (imported by each site below).
+(pms) {
 	encode zstd gzip
 
 	# Backend (NestJS): REST API, health checks, Swagger docs and websockets.
@@ -23,4 +30,14 @@
 	handle {
 		reverse_proxy web:3000
 	}
+}
+
+# Public domain — automatic HTTPS (cert + renewal) and HTTP→HTTPS redirect.
+mastrsys.com, www.mastrsys.com {
+	import pms
+}
+
+# Bare-IP / fallback over plain HTTP so http://<server-ip> keeps working.
+:80 {
+	import pms
 }
